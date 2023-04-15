@@ -5,17 +5,9 @@ local NEAR_PLANE = 0.01
 local m = {}
 
 -- the mapping between controller buttons and keyboard
-m.key_from_button = {
-  trigger    = 'f1',
-  grip       = 'f2',
-  thumbstick = 'f3',
-  menu       = 'f4',
-  a          = 'f5',
-  b          = 'f6',
-  x          = 'f7',
-  y          = 'f8',
-  touchpad   = 'f9',
-  proximity  = 'f10',
+m.mouse_from_button = {
+  trigger    = '2', -- right click
+  grip       = '3', -- middle click
 }
 
 m.pose = lovr.math.newMat4()
@@ -65,8 +57,8 @@ local originals = {
 function lovr.headset.update()
   local dt = originals.update()
   -- update controller button states
-  for button, key in pairs(m.key_from_button) do
-    local is_down = lovr.system.isKeyDown(key)
+  for button, mouse_button in pairs(m.mouse_from_button) do
+    local is_down = mouse.isDown(mouse_button)
     m.button_pressed[button]  =     is_down and not m.button_down[button]
     m.button_released[button] = not is_down and     m.button_down[button]
     m.button_down[button] = is_down
@@ -106,12 +98,12 @@ end
 
 
 function lovr.headset.isTracked(device)
-  return device == 'head' or device == 'mouse'
+  return device == 'head' or device == 'hand/left'
 end
 
 
 function lovr.headset.getOrientation(device)
-  if device == 'head' then
+  if not device or device == 'head' then
     return originals.getOrientation('head')
   end
   return quat(m.pose):unpack()
@@ -119,7 +111,7 @@ end
 
 
 function lovr.headset.getPose(device)
-  if device == 'head' then
+  if not device or device == 'head' then
     return originals.getPose('head')
   end
   local x, y, z, _,_,_, angle, ax, ay, az = m.pose:unpack()
@@ -128,7 +120,7 @@ end
 
 
 function lovr.headset.getPosition(device)
-  if device == 'head' then
+  if not device or device == 'head' then
     return originals.getPosition('head')
   end
   local x, y, z = m.pose:unpack()
@@ -171,5 +163,20 @@ function lovr.headset.wasReleased(device, button)
   return m.button_released[button]
 end
 
+
+-- expose the lovr-mouse functions
+m.getScale = mouse.getScale
+m.getX = mouse.getX
+m.getY = mouse.getY
+m.getRawPosition = mouse.getPosition        -- renamed!
+m.setX = mouse.setX
+m.setY = mouse.setY
+m.setRawPosition = mouse.setPosition        -- renamed!
+m.isDown = mouse.isDown
+m.getRelativeMode = mouse.getRelativeMode
+m.setRelativeMode = mouse.setRelativeMode
+m.newCursor = mouse.newCursor
+m.getSystemCursor = mouse.getSystemCursor
+m.setCursor = mouse.setCursor
 
 return m
