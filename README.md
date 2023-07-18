@@ -1,4 +1,8 @@
-# mousearm
+### Update
+
+The mousearm lib is made obsolete as similar behavior is now the default in the LÖVR's desktop headset simulation. I'm archiving the repo.
+
+### Descrption
 
 When running on desktop, [LÖVR](https://github.com/bjornbytes/lovr) has an implementation of virtual headset and a left hand controlled by a mouse.
 
